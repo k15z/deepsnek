@@ -8,15 +8,15 @@ from io import BytesIO
 from time import sleep
 from requests import get
 from random import randint
-from scipy.misc import imread
 from subprocess import Popen, DEVNULL
+from scipy.misc import imread, imresize
 
 CWD = path.dirname(path.abspath(__file__))
 
 def request(url, num_tries=10):
     response = None
     for _ in range(num_tries):
-        try: response = get(url, timeout=1.0)
+        try: response = get(url, timeout=2.0)
         except: sleep(1.0)
         if response != None: break
     return response
@@ -29,7 +29,7 @@ class Game:
     def reset(self):
         self.over = False
         self.state = False
-        self.score = 0.0
+        self.score = 10.0
         self.port = str(randint(3001, 9999))
         self.path = "http://localhost:" + self.port
         Popen("electron app -p " + self.port + " -w", shell=True, cwd=CWD, stdout=DEVNULL)
@@ -50,6 +50,7 @@ class Game:
         if not self.over:
             response = request(self.path + "/state")
             self.state = imread(BytesIO(response.content))
+            self.state = imresize(self.state, (100, 100))[:,:,:3]
         assert type(self.state) != type(False)
         return self.state
 

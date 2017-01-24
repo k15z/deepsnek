@@ -39,7 +39,7 @@ var engine = {
         document.onkeydown({'keyCode': keyCode});
         setTimeout(function () {
             document.onkeyup({'keyCode': keyCode});
-            callback();
+            if (callback) callback();
         }, duration)
     }
 }

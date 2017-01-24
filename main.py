@@ -1,7 +1,9 @@
-from tqdm import tqdm
+from rl import *
 from game import Game
 
-g = Game()
-while not g.ready(): pass
-while not g.is_over():
-    g.do_action(float(input()))
+agent = DDPGAgent()
+
+for i in range(10):
+    print("-----"*16)
+    agent.play(Game(), epsilon=1.0-i/10.0)
+    agent.train()
