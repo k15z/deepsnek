@@ -46,13 +46,12 @@ var engine = {
 
 setInterval(function () {
     if (engine.done()) {
-        remote.app.log("Detected game over, exiting in 30 seconds....");
+        remote.app.log("Detected game over, exiting automatically....");
         setTimeout(function () {
-            remote.app.log("Autoexiting...");
             engine.quit();
-        }, 30000);
+        }, 10000);
     }
-}, 10000);
+}, 30000);
 
 setTimeout(function () {
     if (!engine.ready()) {
@@ -61,7 +60,7 @@ setTimeout(function () {
     } else {
         remote.app.log("Game running...");
     }
-}, 10000)
+}, 30000)
 
 remote.app.log("Starting server on port " + PORT_NUM + "...");
 var server = express();
