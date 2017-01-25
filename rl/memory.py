@@ -6,7 +6,8 @@ class Memory:
         self.entries = []
 
     def sample(self, N):
-        N = min(len(self.entries), N)
+        if N: N = min(len(self.entries), N)
+        else: N = len(self.entries)
         return sample(self.entries, N)
 
     def remember(self, state, action, reward, nstate, terminal):

@@ -39,9 +39,9 @@ class DDPGAgent(Agent):
             terminal = game.is_over()
             self.memory.remember(state, action, reward, nstate, terminal)
             total_reward += reward
-        print(total_reward, len(self.memory.entries))
+        return total_reward, len(self.memory.entries)
 
     def train(self):
-        samples = self.memory.sample(128)
+        samples = self.memory.sample(N=False)
         S, A, R, NS, T = map(np.array, zip(*samples))
-        print(self.ddpg.fit(S, A, R, NS, T).history["loss"][0])
+        return self.ddpg.fit(S, A, R, NS, T).history["loss"][0]
