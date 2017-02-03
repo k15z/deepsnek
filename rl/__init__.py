@@ -25,23 +25,31 @@ class DDPGAgent(Agent):
 
     def play(self, game, epsilon):
         total_reward = 0.0
+        actual_reward = 0.0
         while not game.ready(): pass
         while not game.is_over():
             pscore = game.get_score()
             state = game.get_state()
+
+            intentional = True
             action = self.ddpg.get_actions(np.array([state]))[0]
             if random() < epsilon:
+                intentional = False
                 action[0] = random() * 2.0 - 1.0
+
             game.do_action(action[0])
             nscore = game.get_score()
             reward = nscore - pscore
             nstate = game.get_state()
             terminal = game.is_over()
-            self.memory.remember(state, action, reward, nstate, terminal)
-            total_reward += reward
-        return total_reward, len(self.memory.entries)
 
-    def train(self):
-        samples = self.memory.sample(N=False)
+            self.memory.remember(state, action, reward, nstate, terminal)
+            if intentional:
+                actual_reward += reward
+            total_reward += reward
+        return total_reward, actual_reward
+
+    def train(self, N=10000):
+        samples = self.memory.sample(N=N)
         S, A, R, NS, T = map(np.array, zip(*samples))
         return self.ddpg.fit(S, A, R, NS, T).history["loss"][0]

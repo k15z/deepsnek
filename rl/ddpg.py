@@ -38,15 +38,13 @@ class Actor:
         def make_model():
             state = Input(shape=state_shape)
 
-            conv = Convolution2D(8, 3, 3, subsample=(2, 2))(state)
-            conv = Convolution2D(16, 3, 3, subsample=(2, 2))(conv)
-            conv = Convolution2D(32, 3, 3, subsample=(2, 2))(conv)
-            conv = Convolution2D(64, 3, 3, subsample=(2, 2))(conv)
-            conv = Convolution2D(128, 3, 3, subsample=(2, 2))(conv)
+            conv = Convolution2D(16, 3, 3, subsample=(2, 2), activation='relu')(state)
+            conv = Convolution2D(32, 3, 3, subsample=(2, 2), activation='relu')(conv)
+            conv = Convolution2D(64, 3, 3, subsample=(2, 2), activation='relu')(conv)
             flat = Flatten()(conv)
 
-            action = Dense(16, activation='relu')(flat)
-            action = Dense(action_dim)(action)
+            action = Dense(256, activation='relu')(flat)
+            action = Dense(action_dim, activation='tanh')(action)
             model = Model(input=state, output=action)
             parameter = model.trainable_weights
             return model, state, action, parameter
@@ -90,15 +88,13 @@ class Critic:
             state = Input(shape=state_shape)
             action = Input(shape=[action_dim])
 
-            conv = Convolution2D(8, 3, 3, subsample=(2, 2))(state)
-            conv = Convolution2D(16, 3, 3, subsample=(2, 2))(conv)
-            conv = Convolution2D(32, 3, 3, subsample=(2, 2))(conv)
-            conv = Convolution2D(64, 3, 3, subsample=(2, 2))(conv)
-            conv = Convolution2D(128, 3, 3, subsample=(2, 2))(conv)
+            conv = Convolution2D(16, 3, 3, subsample=(2, 2), activation='relu')(state)
+            conv = Convolution2D(32, 3, 3, subsample=(2, 2), activation='relu')(conv)
+            conv = Convolution2D(64, 3, 3, subsample=(2, 2), activation='relu')(conv)
             flat = Flatten()(conv)
 
             reward = merge([flat, action], mode='concat')
-            reward = Dense(16, activation='relu')(reward)
+            reward = Dense(256, activation='relu')(reward)
             reward = Dense(1)(reward)
             model = Model(input=[state, action], output=reward)
             model.compile(loss='mse', optimizer='adam')
